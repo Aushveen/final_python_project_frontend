@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sports Activity Discovery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    form {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #555;
+    }
+    .results {
+      background: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weather-Based Sports Activity Discovery</h1>
+  
+  <h2>Check Current Weather</h2>
+  <form id="weatherForm">
+    <label for="weatherCity">City:</label>
+    <input type="text" id="weatherCity" name="city" required>
+    <label for="weatherState">State (optional):</label>
+    <input type="text" id="weatherState" name="state">
+    <button type="submit">Get Weather</button>
+  </form>
+  <div id="weatherResult" class="results"></div>
+
+  <h2>Sports Recommendations</h2>
+  <form id="sportsForm">
+    <label for="sport">Select Sport:</label>
+    <select id="sport" name="sport">
+      <option value="basketball">Basketball</option>
+      <option value="pickleball">Pickleball</option>
+      <option value="tennis">Tennis</option>
+      <option value="badminton">Badminton</option>
+      <option value="swimming">Swimming</option>
+      <option value="gym">Gym</option>
+    </select>
+    <label for="sportsCity">City:</label>
+    <input type="text" id="sportsCity" name="city" required>
+    <label for="sportsState">State (optional):</label>
+    <input type="text" id="sportsState" name="state">
+    <label for="sportsEmail">Email (optional):</label>
+    <input type="email" id="sportsEmail" name="email">
+    <button type="submit">Get Sports Recommendations</button>
+  </form>
+  <div id="sportsResult" class="results"></div>
+
+  <h2>Restaurant & Coffee Shop Recommendations</h2>
+  <form id="placesForm">
+    <label for="placesType">Select Type:</label>
+    <select id="placesType" name="type">
+      <option value="restaurant">Restaurant</option>
+      <option value="coffee">Coffee</option>
+    </select>
+    <label for="placesCity">City:</label>
+    <input type="text" id="placesCity" name="city" required>
+    <label for="placesState">State (optional):</label>
+    <input type="text" id="placesState" name="state">
+    <label for="placesEmail">Email (optional):</label>
+    <input type="email" id="placesEmail" name="email">
+    <button type="submit">Get Places Recommendations</button>
+  </form>
+  <div id="placesResult" class="results"></div>
+  
+  <script>
+    const backendUrl = "https://final-python-project-latest.onrender.com";
+  
+    // Handle Weather Form submission
+    document.getElementById("weatherForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const city = document.getElementById("weatherCity").value.trim();
+      const state = document.getElementById("weatherState").value.trim();
+      let url = `${backendUrl}/weather?city=${encodeURIComponent(city)}`;
+      if (state) {
+        url += `&state=${encodeURIComponent(state)}`;
+      }
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        document.getElementById("weatherResult").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        document.getElementById("weatherResult").innerHTML = `<p>Error fetching weather data.</p>`;
+      }
+    });
+  
+    // Handle Sports Recommendations Form submission
+    document.getElementById("sportsForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const sport = document.getElementById("sport").value.trim();
+      const city = document.getElementById("sportsCity").value.trim();
+      const state = document.getElementById("sportsState").value.trim();
+      const email = document.getElementById("sportsEmail").value.trim();
+      const payload = {
+        sport: sport,
+        city: city
+      };
+      if (state) {
+        payload.state = state;
+      }
+      if (email) {
+        payload.email = email;
+      }
+      try {
+        const res = await fetch(`${backendUrl}/sports/recommend`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById("sportsResult").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        document.getElementById("sportsResult").innerHTML = `<p>Error fetching sports recommendations.</p>`;
+      }
+    });
+  
+    // Handle Places Recommendations Form submission
+    document.getElementById("placesForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const type = document.getElementById("placesType").value.trim();
+      const city = document.getElementById("placesCity").value.trim();
+      const state = document.getElementById("placesState").value.trim();
+      const email = document.getElementById("placesEmail").value.trim();
+      const payload = {
+        type: type,
+        city: city
+      };
+      if (state) {
+        payload.state = state;
+      }
+      if (email) {
+        payload.email = email;
+      }
+      try {
+        const res = await fetch(`${backendUrl}/places`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById("placesResult").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        document.getElementById("placesResult").innerHTML = `<p>Error fetching places recommendations.</p>`;
+      }
+    });
+  </script>  
+</body>
+</html>
